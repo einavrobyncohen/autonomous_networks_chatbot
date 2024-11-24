@@ -159,18 +159,32 @@ class AutonomousNetworkBot:
 
 def main():
     st.set_page_config(
-        page_title="Autonomous Networks Expert",
-        page_icon="🤖",
+        page_title="The Autonomous Network Whisperer 🕵️‍♂️",
+        page_icon="🌐",
         layout="wide",
         initial_sidebar_state="collapsed"
     )
     
-    st.title("Autonomous Networks Expert 🤖")
-    st.write("Ask me anything about autonomous networks!")
+    st.title("The Autonomous Network Whisperer 🌟")
+    st.write("""
+    Welcome to **The Autonomous Network Whisperer**! 🤓  
+    I'm here to answer your most curious and complex questions about **autonomous networks**,  
+    whether it's about their architecture, challenges, or benefits.
     
+    I might not have all the answers, but I’ll do my best to **wow you with my AI-powered knowledge!** 🚀  
+    If you’re curious about how I work or want to dive into the code and data that powers me,  
+    check out my developer's [GitHub repository](https://github.com/einavrobyncohen/autonomous_networks_chatbot).  
+    """)
+    
+    st.info("""
+    **Disclaimer:**  
+    While I strive for accuracy, I might make mistakes—I'm just a fancy AI bot, after all! 🤖  
+    Always double-check critical information before using it for important decisions.
+    """)
+
     # Initialize bot
     if "bot" not in st.session_state:
-        with st.spinner("Initializing bot..."):
+        with st.spinner("Initializing the Whisperer..."):
             st.session_state.bot = AutonomousNetworkBot()
     
     # Initialize message history
@@ -183,7 +197,7 @@ def main():
             st.markdown(message["content"])
     
     # Chat input
-    if prompt := st.chat_input("What would you like to know about autonomous networks?"):
+    if prompt := st.chat_input("What autonomous network secrets shall we uncover today?"):
         # Add user message
         st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("user"):
@@ -191,7 +205,7 @@ def main():
         
         # Get and display bot response
         with st.chat_message("assistant"):
-            with st.spinner("Thinking..."):
+            with st.spinner("Let me think..."):
                 chat_history = [(m["content"], m["role"]) for m in st.session_state.messages[:-1]]
                 response = st.session_state.bot.get_response(prompt, chat_history)
                 st.markdown(response["answer"])
