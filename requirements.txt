@@ -9,3 +9,4 @@ huggingface-hub
 ollama
 chromadb==0.3.29
 duckdb>=0.7.1
+openai

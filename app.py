@@ -2,9 +2,18 @@ import streamlit as st
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import Chroma
 from langchain.chains import ConversationalRetrievalChain
-from langchain.llms import Ollama
+from langchain.chat_models import ChatOpenAI
 import chromadb
 from chromadb.config import Settings
+import os
+
+# Add this at the top of your script to handle the OpenAI API key
+if 'OPENAI_API_KEY' not in st.secrets and 'OPENAI_API_KEY' not in os.environ:
+    st.error('OpenAI API key not found. Please add it to your Streamlit secrets or environment variables.')
+    st.stop()
+
+# Get the API key from Streamlit secrets or environment variables
+openai_api_key = st.secrets.get('OPENAI_API_KEY') or os.environ.get('OPENAI_API_KEY')
 
 class AutonomousNetworkBot:
     def __init__(self):
@@ -14,8 +23,13 @@ class AutonomousNetworkBot:
             model_kwargs={'device': 'cpu'},
             encode_kwargs={'normalize_embeddings': True}
         )
-        # Initialize LLM
-        self.llm = Ollama(model="mistral")
+        
+        # Initialize LLM (using OpenAI instead of Ollama)
+        self.llm = ChatOpenAI(
+            model_name="gpt-4o",
+            temperature=0.7,
+            openai_api_key=openai_api_key
+        )
         
         # Initialize ChromaDB with specific settings
         chroma_client = chromadb.Client(Settings(
@@ -33,7 +47,8 @@ class AutonomousNetworkBot:
         # Setup retriever
         retriever = self.vectorstore.as_retriever(
             search_kwargs={
-                "k": 3
+                "k": 3,
+                "maximal_marginal_relevance": True,
             }
         )
         
