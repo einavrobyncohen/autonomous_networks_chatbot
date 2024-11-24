@@ -1,9 +1,10 @@
-# app.py
 import streamlit as st
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import Chroma
 from langchain.chains import ConversationalRetrievalChain
 from langchain.llms import Ollama
+import chromadb
+from chromadb.config import Settings
 
 class AutonomousNetworkBot:
     def __init__(self):
@@ -16,16 +17,23 @@ class AutonomousNetworkBot:
         # Initialize LLM
         self.llm = Ollama(model="mistral")
         
+        # Initialize ChromaDB with specific settings
+        chroma_client = chromadb.Client(Settings(
+            chroma_db_impl="duckdb+parquet",
+            persist_directory="db"
+        ))
+        
         # Load existing vector store
         self.vectorstore = Chroma(
-            persist_directory="db",
-            embedding_function=self.embeddings
+            client=chroma_client,
+            embedding_function=self.embeddings,
+            persist_directory="db"
         )
         
-        # Setup retriever - removed fetch_k parameter
+        # Setup retriever
         retriever = self.vectorstore.as_retriever(
             search_kwargs={
-                "k": 3,
+                "k": 3
             }
         )
         

@@ -3,5 +3,9 @@ langchain
 sentence-transformers
 pypdf
 langchain-community
-chromadb>=0.3.26
-sqlite3-binary >= 3.35.0
+pysqlite3-binary
+sentence-transformers
+huggingface-hub
+ollama
+chromadb==0.3.29
+duckdb>=0.7.1
