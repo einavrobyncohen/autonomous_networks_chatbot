@@ -196,11 +196,10 @@ def main():
                 response = st.session_state.bot.get_response(prompt, chat_history)
                 st.markdown(response["answer"])
                 
-                # Optionally display sources (commented out by default)
-                # if response["sources"]:
-                #     st.write("Sources:")
-                #     for source in response["sources"]:
-                #         st.write(f"- {source.metadata.get('source', 'Unknown source')}")
+                if response["sources"]:
+                     st.write("Sources:")
+                     for source in response["sources"]:
+                         st.write(f"- {source.metadata.get('source', 'Unknown source')}")
         
         # Add bot response to history
         st.session_state.messages.append({"role": "assistant", "content": response["answer"]})
