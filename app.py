@@ -195,7 +195,7 @@ def main():
 
     # Initialize bot
     if "bot" not in st.session_state:
-        with st.spinner("Initializing the Whisperer..."):
+        with st.spinner("Initializing the Chatbot..."):
             st.session_state.bot = AutonomousNetworkBot()
     
     # Initialize message history
