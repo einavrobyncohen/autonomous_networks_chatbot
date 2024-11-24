@@ -158,101 +158,76 @@ class AutonomousNetworkBot:
         return response
 
 def main():
-    # Stylish Header with Better Contrast
-    st.markdown("""
-    <div style="background-color: #1A73E8; padding: 20px; border-radius: 10px; text-align: center;">
-        <h1 style="color: white; font-family: 'Arial';">The Autonomous Network Chatbot 🌟</h1>
-        <p style="color: white; font-size: 18px;">Your one-stop bot for unraveling the secrets of autonomous networks!</p>
-    </div>
-    """, unsafe_allow_html=True)
+    st.set_page_config(
+        page_title="The Autonomous Network Chatbot 🕵️‍♂️",
+        page_icon="🌐",
+        layout="wide",
+        initial_sidebar_state="collapsed"
+    )
+    
+    st.title("The Autonomous Network Chatbot 🌟")
+    st.write("""
+    Welcome to **The Autonomous Network Chatbot**! 🤓  
+    I'm here to answer your most curious and complex questions about **autonomous networks**,  
+    whether it's about their architecture, challenges, or underlying technologies.
+    
+    **Examples of things you can ask me:**  
+    - "What are autonomous networks?"
+    - "What are the benefits of intent-based networking?"
+    - "How do autonomous networks ensure security?"
+    - "What are the challenges in implementing zero-touch automation?"
 
-    # Sidebar with Explanation
-    st.sidebar.title("🤔 Umm.. Autonomous Networks Chatbot?")
-    st.sidebar.markdown("""
-    <div style="font-family: 'Arial'; font-size: 16px;">
-        Autonomous networks are smart, self-managing systems designed to configure, optimize, and heal themselves with minimal human intervention. 
-        I am here to understand them better. 
+    If you’re curious about how I work or want to dive into the code and data that powers me,  
+    check out my developer's [GitHub repository](https://github.com/your-github-repo-link).  
+    """)
+    
+    st.info("""
+    **Disclaimer:**  
+    While I strive for accuracy, I might make mistakes—I'm just a fancy AI bot, after all! 🤖  
+    Always double-check critical information before using it for important decisions.
+    """)
 
-        <br><b>💡 How I Work:</b>  
-        - Powered by Mistral LLM for advanced natural language understanding.  
-        - Hosted on OpenAI's Azure infrastructure for reliable and secure performance.  
-    </div>
-    """, unsafe_allow_html=True)
+    st.sidebar.title("Umm.. Autonomous Networks?")
+    st.sidebar.info("""
+    Autonomous networks are self-managing networks that can monitor, troubleshoot, and optimize themselves.  
+    They rely on AI and machine learning to improve efficiency, reduce costs, and minimize human intervention.  
+    """)
 
-    # Example Queries Section
-    st.markdown("""
-    <div style="margin-top: 20px; padding: 15px; background-color: #F4F6F8; border-radius: 10px; border: 1px solid #DADCE0;">
-        <h3 style="font-family: 'Arial';">Examples of Things You Can Ask Me:</h3>
-        <ul style="font-size: 16px; line-height: 1.8; font-family: 'Arial';">
-            <li>💡 <b>What are autonomous networks?</b></li>
-            <li>🔍 <b>What are the benefits of intent-based networking?</b></li>
-            <li>🔐 <b>How do autonomous networks ensure security?</b></li>
-            <li>⚙️ <b>What are the challenges in implementing zero-touch automation?</b></li>
-        </ul>
-    </div>
-    """, unsafe_allow_html=True)
-
-    # Disclaimer Section
-    st.markdown("""
-    <div style="margin-top: 15px; padding: 15px; background-color: #E8F0FE; border-radius: 10px; border: 1px solid #C3DCF9;">
-        <p style="font-size: 14px; font-family: 'Arial'; color: #1A73E8;"><b>Disclaimer:</b> While I strive for accuracy, I might make mistakes—I'm just a fancy AI bot, after all! 🤖  
-        Always double-check critical information before using it for important decisions.</p>
-    </div>
-    """, unsafe_allow_html=True)
-
-    # Initialize the bot
+    # Initialize bot
     if "bot" not in st.session_state:
         with st.spinner("Initializing the Whisperer..."):
             st.session_state.bot = AutonomousNetworkBot()
-
-    # Initialize chat history
+    
+    # Initialize message history
     if "messages" not in st.session_state:
         st.session_state.messages = []
-
-    # Stylish Chat History
+    
+    # Display chat history
     for message in st.session_state.messages:
-        if message["role"] == "user":
-            st.markdown(f"""
-            <div style="background-color: #DFF7E1; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 5px solid #34A853;">
-                🧑‍💻 <b>User:</b>  
-                {message["content"]}
-            </div>
-            """, unsafe_allow_html=True)
-        elif message["role"] == "assistant":
-            st.markdown(f"""
-            <div style="background-color: #F1F8FF; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 5px solid #1A73E8;">
-                🤖 <b>Bot:</b>  
-                {message["content"]}
-            </div>
-            """, unsafe_allow_html=True)
-
-    # Chat Input
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+    
+    # Chat input
     if prompt := st.chat_input("Ask me anything about autonomous networks!"):
         # Add user message
         st.session_state.messages.append({"role": "user", "content": prompt})
-        st.markdown(f"""
-        <div style="background-color: #DFF7E1; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 5px solid #34A853;">
-            🧑‍💻 <b>User:</b>  
-            {prompt}
-        </div>
-        """, unsafe_allow_html=True)
-
-        # Get bot response
-        with st.spinner("Let me think..."):
-            chat_history = [(m["content"], m["role"]) for m in st.session_state.messages[:-1]]
-            response = st.session_state.bot.get_response(prompt, chat_history)
-
-            # Display bot response
-            st.markdown(f"""
-            <div style="background-color: #F1F8FF; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 5px solid #1A73E8;">
-                🤖 <b>Bot:</b>  
-                {response["answer"]}
-            </div>
-            """, unsafe_allow_html=True)
-
+        with st.chat_message("user"):
+            st.markdown(prompt)
+        
+        # Get and display bot response
+        with st.chat_message("assistant"):
+            with st.spinner("Let me think..."):
+                chat_history = [(m["content"], m["role"]) for m in st.session_state.messages[:-1]]
+                response = st.session_state.bot.get_response(prompt, chat_history)
+                st.markdown(response["answer"])
+                
+                if response["sources"]:
+                     st.write("Sources:")
+                     for source in response["sources"]:
+                         st.write(f"- {source.metadata.get('source', 'Unknown source')}")
+        
         # Add bot response to history
         st.session_state.messages.append({"role": "assistant", "content": response["answer"]})
-
 
 if __name__ == "__main__":
     main()
