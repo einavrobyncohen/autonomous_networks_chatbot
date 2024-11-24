@@ -2,22 +2,45 @@ import streamlit as st
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import Chroma
 from langchain.chains import ConversationalRetrievalChain
-from langchain.chat_models import AzureChatOpenAI  # Changed to Azure-specific class
+from langchain.chat_models import AzureChatOpenAI
+from langchain.memory import ConversationBufferMemory
+from langchain.prompts import PromptTemplate
 import chromadb
 from chromadb.config import Settings
 import os
+from typing import List, Tuple, Dict
 
-# Add Azure OpenAI configurations
+# Azure OpenAI configurations
 if ('AZURE_OPENAI_API_KEY' not in st.secrets and 'AZURE_OPENAI_API_KEY' not in os.environ) or \
    ('AZURE_OPENAI_ENDPOINT' not in st.secrets and 'AZURE_OPENAI_ENDPOINT' not in os.environ) or \
    ('AZURE_OPENAI_DEPLOYMENT_NAME' not in st.secrets and 'AZURE_OPENAI_DEPLOYMENT_NAME' not in os.environ):
     st.error('Azure OpenAI credentials not found. Please add API key, endpoint, and deployment name to your Streamlit secrets or environment variables.')
     st.stop()
 
-# Get Azure credentials from Streamlit secrets or environment variables
 azure_api_key = st.secrets.get('AZURE_OPENAI_API_KEY') or os.environ.get('AZURE_OPENAI_API_KEY')
 azure_endpoint = st.secrets.get('AZURE_OPENAI_ENDPOINT') or os.environ.get('AZURE_OPENAI_ENDPOINT')
 azure_deployment = st.secrets.get('AZURE_OPENAI_DEPLOYMENT_NAME') or os.environ.get('AZURE_OPENAI_DEPLOYMENT_NAME')
+
+# Custom prompt template
+CUSTOM_PROMPT = PromptTemplate(
+    input_variables=["context", "question", "chat_history"],
+    template="""You are an expert on autonomous networks with deep technical knowledge. Use the following context and chat history to provide a detailed, specific answer to the question. Focus on being accurate and informative while avoiding generic responses.
+
+Context: {context}
+
+Chat History: {chat_history}
+
+Question: {question}
+
+Important Guidelines:
+1. If the question is not about autonomous networks, politely decline to answer
+2. Use specific examples and technical details from the provided context
+3. If different sources provide conflicting information, acknowledge it
+4. If the context doesn't contain enough information to fully answer the question, acknowledge the limitations
+5. Maintain a professional, technical tone while being clear and concise
+
+Answer:"""
+)
 
 class AutonomousNetworkBot:
     def __init__(self):
@@ -32,9 +55,9 @@ class AutonomousNetworkBot:
         self.llm = AzureChatOpenAI(
             deployment_name=azure_deployment,
             openai_api_key=azure_api_key,
-            openai_api_version="2023-05-15",  # Update this to your Azure OpenAI API version
+            openai_api_version="2023-05-15",
             azure_endpoint=azure_endpoint,
-            temperature=0.7
+            temperature=0.3  # Reduced temperature for more focused responses
         )
         
         # Initialize ChromaDB with specific settings
@@ -43,46 +66,98 @@ class AutonomousNetworkBot:
             persist_directory="db"
         ))
         
-        # Load existing vector store
+        # Load vector store
         self.vectorstore = Chroma(
             client=chroma_client,
             embedding_function=self.embeddings,
             persist_directory="db"
         )
         
-        # Setup retriever
-        retriever = self.vectorstore.as_retriever(
+        # Initialize memory
+        self.memory = ConversationBufferMemory(
+            memory_key="chat_history",
+            return_messages=True,
+            output_key='answer'
+        )
+        
+        # Setup retriever with search parameters
+        self.retriever = self.vectorstore.as_retriever(
+            search_type="mmr",  # Use Maximum Marginal Relevance
             search_kwargs={
-                "k": 3
+                "k": 4,  # Retrieve more documents
+                "fetch_k": 8,  # Consider a larger initial set
+                "lambda_mult": 0.7  # Diversity factor
             }
         )
         
+        # Initialize chain with custom prompt
         self.chain = ConversationalRetrievalChain.from_llm(
             llm=self.llm,
-            retriever=retriever,
+            retriever=self.retriever,
+            memory=self.memory,
+            combine_docs_chain_kwargs={"prompt": CUSTOM_PROMPT},
             return_source_documents=True,
             verbose=True
         )
 
-    def get_response(self, query, chat_history):
-        return self._get_cached_response(query, chat_history, self.chain)
-    
-    @staticmethod
-    @st.cache_data(ttl=3600)
-    def _get_cached_response(_query, _chat_history, _chain):
-        prompt = f"""
-        You are an expert on autonomous networks. Be concise and to the point. 
-        If the question is not about autonomous networks, respond with a single 
-        sentence declining to answer.
+    def get_response(self, query: str, chat_history: List[Tuple[str, str]]) -> Dict:
+        """Get response with enhanced context handling and filtering."""
+        # Check if query is about autonomous networks
+        if not self._is_relevant_query(query):
+            return {
+                "answer": "I can only answer questions about autonomous networks. Please ask a question related to autonomous networks.",
+                "sources": []
+            }
 
-        Question: {_query}
-        """
+        # Get response from chain
+        result = self.chain({"question": query, "chat_history": chat_history})
         
-        result = _chain({"question": prompt, "chat_history": _chat_history})
-        return result["answer"]
+        # Process and validate response
+        processed_response = self._process_response(result["answer"], query)
+        
+        return {
+            "answer": processed_response,
+            "sources": result.get("source_documents", [])
+        }
+
+    def _is_relevant_query(self, query: str) -> bool:
+        """Check if query is related to autonomous networks."""
+        relevant_terms = [
+            "autonomous", "network", "ai", "automation", "self-managing",
+            "self-healing", "intent-based", "zero-touch", "machine learning",
+            "orchestration", "sdn", "nfv", "telemetry", "analytics"
+        ]
+        query_lower = query.lower()
+        return any(term in query_lower for term in relevant_terms)
+
+    def _process_response(self, response: str, query: str) -> str:
+        """Process and validate response."""
+        # Check for generic responses
+        generic_patterns = [
+            "autonomous networks are self-managing networks",
+            "autonomous networks utilize artificial intelligence",
+            "autonomous networks are networks that"
+        ]
+        
+        if any(pattern in response.lower() for pattern in generic_patterns):
+            # If response is too generic, try to make it more specific
+            specific_terms = {
+                "advantages": "specific benefits include",
+                "benefits": "key advantages are",
+                "components": "main components include",
+                "architecture": "the architecture consists of",
+                "challenges": "key challenges include",
+                "implementation": "implementation involves",
+                "features": "important features include"
+            }
+            
+            for term, prefix in specific_terms.items():
+                if term in query.lower():
+                    return f"{prefix} {response}"
+        
+        return response
 
 def main():
-    # Page config
     st.set_page_config(
         page_title="Autonomous Networks Expert",
         page_icon="🤖",
@@ -118,11 +193,17 @@ def main():
         with st.chat_message("assistant"):
             with st.spinner("Thinking..."):
                 chat_history = [(m["content"], m["role"]) for m in st.session_state.messages[:-1]]
-                response = st.session_state.bot.get_response(prompt, tuple(chat_history))
-                st.markdown(response)
+                response = st.session_state.bot.get_response(prompt, chat_history)
+                st.markdown(response["answer"])
+                
+                # Optionally display sources (commented out by default)
+                # if response["sources"]:
+                #     st.write("Sources:")
+                #     for source in response["sources"]:
+                #         st.write(f"- {source.metadata.get('source', 'Unknown source')}")
         
         # Add bot response to history
-        st.session_state.messages.append({"role": "assistant", "content": response})
+        st.session_state.messages.append({"role": "assistant", "content": response["answer"]})
 
 if __name__ == "__main__":
     main()
