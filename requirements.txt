@@ -1,7 +1,8 @@
 streamlit
 langchain
-chromadb
 sentence-transformers
 pypdf
 langchain-community
+chromadb>=0.3.26
 duckdb
+pysqlite3-binary

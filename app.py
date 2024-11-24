@@ -21,7 +21,9 @@ class AutonomousNetworkBot:
         self.vectorstore = Chroma(
             persist_directory="db",
             embedding_function=self.embeddings,
-            settings=Settings(chroma_db_impl="duckdb")
+            chroma_client_settings={
+            "chroma_db_impl": "duckdb"  # Explicitly set backend
+        }
         )
         
         # Setup retriever - removed fetch_k parameter
