@@ -158,25 +158,32 @@ class AutonomousNetworkBot:
         return response
 
 def main():
-    # Stylish Header
+    # Stylish Header with Better Contrast
     st.markdown("""
-    <div style="background-color: #2E86C1; padding: 20px; border-radius: 10px; text-align: center;">
-        <h1 style="color: white;">The Autonomous Network Chatbot 🌟</h1>
-        <p style="color: white; font-size: large;">Your one-stop bot for unraveling the secrets of autonomous networks!</p>
+    <div style="background-color: #1A73E8; padding: 20px; border-radius: 10px; text-align: center;">
+        <h1 style="color: white; font-family: 'Arial';">The Autonomous Network Chatbot 🌟</h1>
+        <p style="color: white; font-size: 18px;">Your one-stop bot for unraveling the secrets of autonomous networks!</p>
     </div>
     """, unsafe_allow_html=True)
 
-    # Sidebar with Overview
-    st.sidebar.title("🤔 Umm.. Autonomous Networks?")
-    st.sidebar.info("""
-    Autonomous networks are smart, self-managing systems designed to configure, optimize, and heal themselves with minimal human intervention.   
-    """)
+    # Sidebar with Explanation
+    st.sidebar.title("🤔 Umm.. Autonomous Networks Chatbot?")
+    st.sidebar.markdown("""
+    <div style="font-family: 'Arial'; font-size: 16px;">
+        Autonomous networks are smart, self-managing systems designed to configure, optimize, and heal themselves with minimal human intervention. 
+        I am here to understand them better. 
 
-    # Introduction and Example Queries
+        <br><b>💡 How I Work:</b>  
+        - Powered by Mistral LLM for advanced natural language understanding.  
+        - Hosted on OpenAI's Azure infrastructure for reliable and secure performance.  
+    </div>
+    """, unsafe_allow_html=True)
+
+    # Example Queries Section
     st.markdown("""
-    <div style="margin-top: 20px; padding: 10px; border-radius: 10px; background-color: #F7F9F9;">
-        <h3>Examples of Things You Can Ask Me:</h3>
-        <ul style="font-size: large; line-height: 1.8;">
+    <div style="margin-top: 20px; padding: 15px; background-color: #F4F6F8; border-radius: 10px; border: 1px solid #DADCE0;">
+        <h3 style="font-family: 'Arial';">Examples of Things You Can Ask Me:</h3>
+        <ul style="font-size: 16px; line-height: 1.8; font-family: 'Arial';">
             <li>💡 <b>What are autonomous networks?</b></li>
             <li>🔍 <b>What are the benefits of intent-based networking?</b></li>
             <li>🔐 <b>How do autonomous networks ensure security?</b></li>
@@ -186,11 +193,12 @@ def main():
     """, unsafe_allow_html=True)
 
     # Disclaimer Section
-    st.info("""
-    **Disclaimer:**  
-    While I strive for accuracy, I might make mistakes—I'm just a fancy AI bot, after all! 🤖  
-    Always double-check critical information before using it for important decisions.
-    """)
+    st.markdown("""
+    <div style="margin-top: 15px; padding: 15px; background-color: #E8F0FE; border-radius: 10px; border: 1px solid #C3DCF9;">
+        <p style="font-size: 14px; font-family: 'Arial'; color: #1A73E8;"><b>Disclaimer:</b> While I strive for accuracy, I might make mistakes—I'm just a fancy AI bot, after all! 🤖  
+        Always double-check critical information before using it for important decisions.</p>
+    </div>
+    """, unsafe_allow_html=True)
 
     # Initialize the bot
     if "bot" not in st.session_state:
@@ -201,42 +209,43 @@ def main():
     if "messages" not in st.session_state:
         st.session_state.messages = []
 
-    # Display Chat History with Stylish Messages
+    # Stylish Chat History
     for message in st.session_state.messages:
         if message["role"] == "user":
             st.markdown(f"""
-            <div style="background-color: #E8F6F3; padding: 10px; border-left: 5px solid #48C9B0; border-radius: 5px; margin-bottom: 10px;">
-                🧑‍💻 **User:**  
+            <div style="background-color: #DFF7E1; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 5px solid #34A853;">
+                🧑‍💻 <b>User:</b>  
                 {message["content"]}
             </div>
             """, unsafe_allow_html=True)
         elif message["role"] == "assistant":
             st.markdown(f"""
-            <div style="background-color: #F9F9F9; padding: 10px; border-left: 5px solid #2E86C1; border-radius: 5px; margin-bottom: 10px;">
-                🤖 **Bot:**  
+            <div style="background-color: #F1F8FF; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 5px solid #1A73E8;">
+                🤖 <b>Bot:</b>  
                 {message["content"]}
             </div>
             """, unsafe_allow_html=True)
 
     # Chat Input
     if prompt := st.chat_input("Ask me anything about autonomous networks!"):
-        # Add user message to history
+        # Add user message
         st.session_state.messages.append({"role": "user", "content": prompt})
         st.markdown(f"""
-        <div style="background-color: #E8F6F3; padding: 10px; border-left: 5px solid #48C9B0; border-radius: 5px; margin-bottom: 10px;">
-            🧑‍💻 **User:**  
+        <div style="background-color: #DFF7E1; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 5px solid #34A853;">
+            🧑‍💻 <b>User:</b>  
             {prompt}
         </div>
         """, unsafe_allow_html=True)
 
-        # Get and display bot response
+        # Get bot response
         with st.spinner("Let me think..."):
             chat_history = [(m["content"], m["role"]) for m in st.session_state.messages[:-1]]
             response = st.session_state.bot.get_response(prompt, chat_history)
 
+            # Display bot response
             st.markdown(f"""
-            <div style="background-color: #F9F9F9; padding: 10px; border-left: 5px solid #2E86C1; border-radius: 5px; margin-bottom: 10px;">
-                🤖 **Bot:**  
+            <div style="background-color: #F1F8FF; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 5px solid #1A73E8;">
+                🤖 <b>Bot:</b>  
                 {response["answer"]}
             </div>
             """, unsafe_allow_html=True)
