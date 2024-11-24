@@ -4,3 +4,4 @@ chromadb
 sentence-transformers
 pypdf
 langchain-community
+duckdb

@@ -4,6 +4,7 @@ from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import Chroma
 from langchain.chains import ConversationalRetrievalChain
 from langchain.llms import Ollama
+from chromadb.config import Settings
 
 class AutonomousNetworkBot:
     def __init__(self):
@@ -19,7 +20,8 @@ class AutonomousNetworkBot:
         # Load existing vector store
         self.vectorstore = Chroma(
             persist_directory="db",
-            embedding_function=self.embeddings
+            embedding_function=self.embeddings,
+            settings=Settings(chroma_db_impl="duckdb")
         )
         
         # Setup retriever - removed fetch_k parameter
