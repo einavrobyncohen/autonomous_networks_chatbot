@@ -47,8 +47,7 @@ class AutonomousNetworkBot:
         # Setup retriever
         retriever = self.vectorstore.as_retriever(
             search_kwargs={
-                "k": 3,
-                "maximal_marginal_relevance": True,
+                "k": 3
             }
         )
         
