@@ -159,27 +159,42 @@ class AutonomousNetworkBot:
 
 def main():
     st.set_page_config(
-        page_title="The Autonomous Network Whisperer 🕵️‍♂️",
+        page_title="The Autonomous Network Chatbot 🕵️‍♂️",
         page_icon="🌐",
         layout="wide",
         initial_sidebar_state="collapsed"
     )
     
-    st.title("The Autonomous Network Whisperer 🌟")
+    st.title("The Autonomous Network Chatbot 🌟")
     st.write("""
-    Welcome to **The Autonomous Network Whisperer**! 🤓  
+    Welcome to **The Autonomous Network Chatbot**! 🤓  
     I'm here to answer your most curious and complex questions about **autonomous networks**,  
     whether it's about their architecture, challenges, or benefits.
     
-    I might not have all the answers, but I’ll do my best to **wow you with my AI-powered knowledge!** 🚀  
+    If you’re new here, autonomous networks are smart networks that can manage themselves.  
+    They use artificial intelligence to handle tasks like monitoring, troubleshooting, and optimization—  
+    all with minimal human intervention.
+    
+    **Examples of things you can ask me:**  
+    - "What are autonomous networks?"
+    - "What are the benefits of intent-based networking?"
+    - "How do autonomous networks ensure security?"
+    - "What are the challenges in implementing zero-touch automation?"
+
     If you’re curious about how I work or want to dive into the code and data that powers me,  
-    check out my developer's [GitHub repository](https://github.com/einavrobyncohen/autonomous_networks_chatbot).  
+    check out my developer's [GitHub repository](https://github.com/your-github-repo-link).  
     """)
     
     st.info("""
     **Disclaimer:**  
     While I strive for accuracy, I might make mistakes—I'm just a fancy AI bot, after all! 🤖  
     Always double-check critical information before using it for important decisions.
+    """)
+
+    st.sidebar.title("Umm.. Autonomous Networks?")
+    st.sidebar.info("""
+    Autonomous networks are self-managing networks that can monitor, troubleshoot, and optimize themselves.  
+    They rely on AI and machine learning to improve efficiency, reduce costs, and minimize human intervention.  
     """)
 
     # Initialize bot
@@ -197,7 +212,7 @@ def main():
             st.markdown(message["content"])
     
     # Chat input
-    if prompt := st.chat_input("What autonomous network secrets shall we uncover today?"):
+    if prompt := st.chat_input("Ask me anything about autonomous networks!"):
         # Add user message
         st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("user"):
