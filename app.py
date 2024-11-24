@@ -2,18 +2,22 @@ import streamlit as st
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import Chroma
 from langchain.chains import ConversationalRetrievalChain
-from langchain.chat_models import ChatOpenAI
+from langchain.chat_models import AzureChatOpenAI  # Changed to Azure-specific class
 import chromadb
 from chromadb.config import Settings
 import os
 
-# Add this at the top of your script to handle the OpenAI API key
-if 'OPENAI_API_KEY' not in st.secrets and 'OPENAI_API_KEY' not in os.environ:
-    st.error('OpenAI API key not found. Please add it to your Streamlit secrets or environment variables.')
+# Add Azure OpenAI configurations
+if ('AZURE_OPENAI_API_KEY' not in st.secrets and 'AZURE_OPENAI_API_KEY' not in os.environ) or \
+   ('AZURE_OPENAI_ENDPOINT' not in st.secrets and 'AZURE_OPENAI_ENDPOINT' not in os.environ) or \
+   ('AZURE_OPENAI_DEPLOYMENT_NAME' not in st.secrets and 'AZURE_OPENAI_DEPLOYMENT_NAME' not in os.environ):
+    st.error('Azure OpenAI credentials not found. Please add API key, endpoint, and deployment name to your Streamlit secrets or environment variables.')
     st.stop()
 
-# Get the API key from Streamlit secrets or environment variables
-openai_api_key = st.secrets.get('OPENAI_API_KEY') or os.environ.get('OPENAI_API_KEY')
+# Get Azure credentials from Streamlit secrets or environment variables
+azure_api_key = st.secrets.get('AZURE_OPENAI_API_KEY') or os.environ.get('AZURE_OPENAI_API_KEY')
+azure_endpoint = st.secrets.get('AZURE_OPENAI_ENDPOINT') or os.environ.get('AZURE_OPENAI_ENDPOINT')
+azure_deployment = st.secrets.get('AZURE_OPENAI_DEPLOYMENT_NAME') or os.environ.get('AZURE_OPENAI_DEPLOYMENT_NAME')
 
 class AutonomousNetworkBot:
     def __init__(self):
@@ -24,11 +28,13 @@ class AutonomousNetworkBot:
             encode_kwargs={'normalize_embeddings': True}
         )
         
-        # Initialize LLM (using OpenAI instead of Ollama)
-        self.llm = ChatOpenAI(
-            model_name="gpt-4o",
-            temperature=0.7,
-            openai_api_key=openai_api_key
+        # Initialize Azure OpenAI LLM
+        self.llm = AzureChatOpenAI(
+            deployment_name=azure_deployment,
+            openai_api_key=azure_api_key,
+            openai_api_version="2023-05-15",  # Update this to your Azure OpenAI API version
+            azure_endpoint=azure_endpoint,
+            temperature=0.7
         )
         
         # Initialize ChromaDB with specific settings
