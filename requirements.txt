@@ -4,4 +4,4 @@ sentence-transformers
 pypdf
 langchain-community
 chromadb>=0.3.26
-pysqlite3-binary >= 3.35.0
+sqlite3-binary >= 3.35.0
