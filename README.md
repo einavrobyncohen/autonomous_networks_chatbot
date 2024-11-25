@@ -38,6 +38,6 @@ The chatbot is trained on the following resources:
 ## ⚙️ How It Works
 1. **User Query**: The user asks a question about autonomous networks.
 2. **Retrieval**: Relevant context is fetched from the vector database using ChromaDB.
-3. **Response Generation**: The Mistral LLM processes the query and context to generate a detailed, accurate response.
+3. **Response Generation**: The gpt-4o LLM processes the query and context to generate a detailed, accurate response.
 4. **Response Delivery**: The bot displays the response in an easy-to-read, conversational format.
 
