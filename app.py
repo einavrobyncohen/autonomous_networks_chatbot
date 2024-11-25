@@ -178,7 +178,7 @@ def main():
     - "What are the challenges in implementing zero-touch automation?"
 
     If you’re curious about how I work or want to dive into the code and data that powers me,  
-    check out my developer's [GitHub repository](https://github.com/your-github-repo-link).  
+    check out my developer's [GitHub repository](https://github.com/einavrobyncohen/autonomous_networks_chatbot).  
     """)
     
     st.info("""

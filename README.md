@@ -18,21 +18,6 @@ The primary goal of this project is to create a conversational assistant that:
 
 ---
 
-## 🛠️ Technologies Used
-This chatbot leverages cutting-edge tools and frameworks to deliver a seamless user experience:
-
-### Backend:
-- **Mistral LLM**: A powerful language model that provides advanced conversational abilities.
-- **OpenAI Azure Infrastructure**: Ensures secure and scalable hosting for the AI model.
-- **LangChain Framework**: Simplifies interaction with the LLM and manages conversational flows.
-- **ChromaDB (DuckDB backend)**: A high-performance vector database for fast retrieval of contextual documents.
-
-### Frontend:
-- **Streamlit**: A lightweight and interactive framework for building the web app.
-- **Custom HTML/CSS Styling**: For a modern and aesthetic user interface.
-
----
-
 ## 📚 Data Sources
 The chatbot is trained on the following resources:
 1. **TM Forum Guides**: Industry-leading standards and frameworks for autonomous networks.
